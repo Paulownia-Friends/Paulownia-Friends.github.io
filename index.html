@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light dark" />
+
+  <title>タスクリマインダー -課題管理- | paulownia-friends</title>
+  <meta name="description" content="paulownia-friends が開発する『タスクリマインダー -課題管理-』。シンプルで使いやすく、壁紙を自由に変えられるタスク管理アプリ。" />
+
+  <!-- Favicon / App Icon -->
+  <link rel="icon" href="icon.png" />
+  <link rel="apple-touch-icon" href="icon.png" />
+
+  <!-- Open Graph (SNSプレビュー) -->
+  <meta property="og:title" content="タスクリマインダー -課題管理-" />
+  <meta property="og:description" content="シンプルで使いやすい。壁紙を変えられるタスク管理アプリ。" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="icon.png" />
+
+  <style>
+    :root{
+      --bg0:#faf7ff;
+      --bg1:#f6f0ff;
+      --card:rgba(255,255,255,.78);
+      --stroke:rgba(0,0,0,.08);
+      --text:#1e1e2a;
+      --muted:rgba(30,30,42,.70);
+      --shadow: 0 18px 50px rgba(30, 30, 42, .12);
+      --shadow2: 0 10px 30px rgba(30, 30, 42, .10);
+      --radius: 22px;
+
+      --accentA:#b9a7ff;
+      --accentB:#ffb6f2;
+      --accentC:#ffd6f7;
+    }
+    @media (prefers-color-scheme: dark){
+      :root{
+        --bg0:#0b0a12;
+        --bg1:#111027;
+        --card:rgba(20,18,40,.72);
+        --stroke:rgba(255,255,255,.10);
+        --text:#f3f2ff;
+        --muted:rgba(243,242,255,.72);
+        --shadow: 0 18px 50px rgba(0, 0, 0, .40);
+        --shadow2: 0 10px 30px rgba(0, 0, 0, .35);
+      }
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, "SF Pro Display", "SF Pro Text",
+                   "Hiragino Sans", "Noto Sans JP", "Segoe UI", Arial, sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 15% 10%, color-mix(in srgb, var(--accentA) 40%, transparent) 0%, transparent 55%),
+        radial-gradient(900px 600px at 75% 25%, color-mix(in srgb, var(--accentB) 35%, transparent) 0%, transparent 55%),
+        radial-gradient(1000px 650px at 55% 85%, color-mix(in srgb, var(--accentC) 35%, transparent) 0%, transparent 60%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      overflow-x:hidden;
+    }
+
+    .wrap{
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 28px 18px 54px;
+    }
+
+    header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      padding: 10px 2px 18px;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      text-decoration:none;
+      color:inherit;
+    }
+    .brand img{
+      width:44px; height:44px;
+      border-radius: 12px;
+      box-shadow: var(--shadow2);
+    }
+    .brand .meta{
+      display:flex; flex-direction:column; line-height:1.1;
+    }
+    .brand .meta strong{ font-size: 14px; letter-spacing:.02em; }
+    .brand .meta span{ font-size: 12px; color: var(--muted); margin-top:3px; }
+
+    nav{
+      display:flex; gap:10px; flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+    nav a{
+      font-size: 13px;
+      color: var(--muted);
+      text-decoration:none;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--stroke);
+      background: color-mix(in srgb, var(--card) 65%, transparent);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      transition: transform .15s ease, background .15s ease;
+    }
+    nav a:hover{ transform: translateY(-1px); background: color-mix(in srgb, var(--card) 90%, transparent); }
+
+    .hero{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 18px;
+      align-items:stretch;
+      margin-top: 10px;
+    }
+    @media (max-width: 860px){
+      .hero{ grid-template-columns: 1fr; }
+    }
+
+    .card{
+      border-radius: var(--radius);
+      background: var(--card);
+      border: 1px solid var(--stroke);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    .hero-left{
+      padding: 26px 24px;
+      position:relative;
+      overflow:hidden;
+    }
+    .hero-left:before{
+      content:"";
+      position:absolute; inset:-2px;
+      background:
+        radial-gradient(600px 400px at 10% 10%, color-mix(in srgb, var(--accentA) 25%, transparent), transparent 60%),
+        radial-gradient(520px 380px at 75% 35%, color-mix(in srgb, var(--accentB) 22%, transparent), transparent 58%);
+      opacity:.9;
+      pointer-events:none;
+    }
+    .hero-left > *{ position:relative; }
+
+    .kicker{
+      font-size: 13px;
+      color: var(--muted);
+      letter-spacing:.04em;
+      margin: 0 0 10px;
+    }
+    h1{
+      margin: 0 0 10px;
+      font-size: clamp(26px, 3.2vw, 38px);
+      letter-spacing: -0.02em;
+    }
+    .lead{
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    .cta{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-top: 12px;
+    }
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      text-decoration:none;
+      font-weight: 650;
+      font-size: 14px;
+      border: 1px solid var(--stroke);
+      transition: transform .15s ease, filter .15s ease, background .15s ease;
+      user-select:none;
+    }
+    .btn.primary{
+      background: linear-gradient(135deg, color-mix(in srgb, var(--accentA) 80%, white),
+                                        color-mix(in srgb, var(--accentB) 70%, white));
+      color: #1b1430;
+      box-shadow: 0 14px 40px rgba(185, 167, 255, .35);
+    }
+    .btn.secondary{
+      background: color-mix(in srgb, var(--card) 90%, transparent);
+      color: var(--text);
+    }
+    .btn:hover{ transform: translateY(-1px); filter: saturate(1.05); }
+
+    .hero-right{
+      padding: 18px;
+      display:flex;
+      flex-direction:column;
+      gap: 12px;
+      justify-content:space-between;
+    }
+
+    .feature{
+      padding: 14px 14px;
+      border-radius: 18px;
+      border: 1px solid var(--stroke);
+      background: color-mix(in srgb, var(--card) 85%, transparent);
+    }
+    .feature strong{
+      display:block;
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+    .feature p{
+      margin:0;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 18px;
+    }
+    @media (max-width: 860px){
+      .grid{ grid-template-columns: 1fr; }
+    }
+    .mini{
+      padding: 18px;
+    }
+    .mini h2{
+      margin: 0 0 8px;
+      font-size: 15px;
+    }
+    .mini p{
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    footer{
+      margin-top: 26px;
+      padding: 16px 4px 0;
+      color: var(--muted);
+      font-size: 12px;
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    footer a{ color: inherit; }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <a class="brand" href="#">
+        <img src="icon.png" alt="App Icon">
+        <div class="meta">
+          <strong>paulownia-friends</strong>
+          <span>Developer</span>
+        </div>
+      </a>
+
+      <nav>
+        <a href="#about">概要</a>
+        <a href="#features">特長</a>
+        <a href="#links">リンク</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div class="card hero-left" id="about">
+        <p class="kicker">Task Reminder / Assignment Manager</p>
+        <h1>タスクリマインダー -課題管理-</h1>
+        <p class="lead">
+          “シンプルで使いやすい” を最優先に設計したタスク管理アプリ。<br>
+          壁紙（テーマ）を変えて、気分よく続けられます。
+        </p>
+
+        <div class="cta" id="links">
+          <!-- TODO: App Store のURLに置き換えてください -->
+          <a class="btn primary" href="https://apps.apple.com/jp/app/%E3%82%BF%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%9E%E3%82%A4%E3%83%B3%E3%83%80%E3%83%BC-taskreminder-%E8%AA%B2%E9%A1%8C%E7%AE%A1%E7%90%86/id1547824914" target="_blank" rel="noopener noreferrer">
+            App Storeで見る
+          </a>
+
+          <!-- TODO: プライバシーポリシーURLを置き換え（必要なら） -->
+          <a class="btn secondary" href="https://iosappdevelopers.hatenablog.com/entry/2021/02/01/222357" target="_blank" rel="noopener noreferrer">
+            Privacy Policy
+          </a>
+        </div>
+      </div>
+
+      <div class="card hero-right" id="features">
+        <div class="feature">
+          <strong>✓ 迷わない操作</strong>
+          <p>必要な機能だけを、わかりやすく。毎日使える軽さ。</p>
+        </div>
+        <div class="feature">
+          <strong>✓ 壁紙をカスタマイズ</strong>
+          <p>気分で雰囲気を変えて、タスク管理を楽しく。</p>
+        </div>
+        <div class="feature">
+          <strong>✓ 課題・やることをスッキリ整理</strong>
+          <p>短い時間でも、今日やることがすぐ分かる。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="card mini">
+        <h2>こんな人に</h2>
+        <p>
+          ・やることが多くて頭が散らかる<br>
+          ・複雑なToDoアプリは続かない<br>
+          ・見た目も大事にしたい
+        </p>
+      </div>
+      <div class="card mini">
+        <h2>開発チーム</h2>
+        <p>
+          paulownia-friends は、使うたび気分が整う “やさしい道具” を目指して開発しています。
+        </p>
+      </div>
+      <div class="card mini">
+        <h2>技術的メモ</h2>
+        <p>
+          GitHub Pages で公開中。<br>
+          <a href="/app-ads.txt">app-ads.txt</a>（AdMob用）も同一ドメインに配置できます。
+        </p>
+      </div>
+    </section>
+
+    <footer>
+      <div>© <span id="y"></span> paulownia-friends</div>
+      <div>
+        <!-- TODO: メールアドレスを差し替え -->
+        Contact: <a href="mailto:murahaseteru.toho52@gmail.com">hello@example.com</a>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    document.getElementById("y").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
